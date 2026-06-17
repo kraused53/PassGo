@@ -58,3 +58,13 @@ def get_user_int(msg: str) -> int:
 
     return user_input
 ```
+
+### File Contents and Navigation Manual (6/17/2026)
+In general: if the file name contains 'Screen', that means it contains GUI interface code for one of the screens. Otherwise, it refers to a functionality/backend aspect, such as the password generation algorithm. This will stay as our naming convention for other files. Each GUI screen will have its own file for readability purposes.
+Currently these are the files developed for the project in the repo:
+homeScreen.py - the homescreen of PassGo. As of this version, run this file to see the current portion of the software created (by Neil Patil)
+passWordGeneratorScreen.py - this file contains the GUI for the password generator page. (by Neil Patil)
+passwordGeneratorAlgo.py - this file contains the algorithm that generates passwords and handles edge cases. Updated to be more efficient and checks the common passwords CSV. (by Neil Patil)
+savePasswordScreen - This file contains the GUI for the save password page. It already takes the value from the generator screen smoothly. (by Neil Patil)
+savePassword.py - this is where the saving password logic will go - to be completed by the encryption and password storage and retrieval team.
+common_passwords.csv - the list of common passwords from Kaggle.
