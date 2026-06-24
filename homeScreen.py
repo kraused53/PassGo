@@ -2,14 +2,25 @@
 import tkinter as tk
 from tkinter import messagebox
 import webbrowser
+from AppData import AppData
 
 class PassGoHomeApp:
-    def __init__(self, root):
+    def __init__(self, root, data: AppData = None):
         self.root = root
         # --- Window Configuration ---
         self.root.title("PassGo Home")
         self.root.configure(bg="#e3eaf2")
-        
+
+        # Application Data
+        if data is None:
+            # If not given a data source, generate a new one.
+            # This allows first time setup
+            self.data = AppData()
+        else:
+            # If this is not the first time PassGoHome has been called,
+            # Copy the data
+            self.data = data
+
         self.window_width = 800
         self.window_height = 500 
         
@@ -57,21 +68,38 @@ class PassGoHomeApp:
         gen_btn.pack(side="left", expand=True, fill="both", padx=(0, 20))
 
         # View and Edit Saved Passwords Button
-        view_btn = tk.Button(
-            action_frame, 
-            text="View and Edit\nSaved Passwords", 
-            command=self.open_saved_passwords,
-            bg="#FFA500", 
-            activebackground="#FF8C00", 
-            fg="black", 
-            font=button_font, 
-            width=20, 
-            height=3, 
-            bd=0, 
-            relief="flat",
-            cursor="hand2"
-        )
-        view_btn.pack(side="right", expand=True, fill="both", padx=(20, 0))
+        if self.data.is_user_logged_in():
+            view_btn = tk.Button(
+                action_frame,
+                text="View and Edit\nSaved Passwords",
+                command=self.view_saved_passwords,
+                bg="#FFA500",
+                activebackground="#FF8C00",
+                fg="black",
+                font=button_font,
+                width=20,
+                height=3,
+                bd=0,
+                relief="flat",
+                cursor="hand2"
+            )
+            view_btn.pack(side="right", expand=True, fill="both", padx=(20, 0))
+        else:
+            load_btn = tk.Button(
+                action_frame,
+                text="Load Your Passwords",
+                command=self.open_saved_passwords,
+                bg="#FFA500",
+                activebackground="#FF8C00",
+                fg="black",
+                font=button_font,
+                width=20,
+                height=3,
+                bd=0,
+                relief="flat",
+                cursor="hand2"
+            )
+            load_btn.pack(side="right", expand=True, fill="both", padx=(20, 0))
 
         # --- Info / Breach Check Box ---
         info_frame = tk.Frame(self.root, bg="white", bd=1, relief="solid")
@@ -93,7 +121,7 @@ class PassGoHomeApp:
         info_label_link = tk.Label(
             info_frame, 
             text=link_text, 
-            font=link_font, 
+            font=link_font,
             bg="white", 
             fg="#00FFFF",  # Aqua color
             cursor="hand2"
@@ -105,16 +133,16 @@ class PassGoHomeApp:
 
         # --- Exit Button  ---
         exit_btn = tk.Button(
-            self.root, 
-            text="Exit", 
+            self.root,
+            text="Exit",
             command=self.exit_app,
-            bg="#990000",            
-            activebackground="#7a0000", 
-            fg="white",                
-            font=exit_button_font, 
-            width=15,                  
-            height=2,                  
-            bd=0, 
+            bg="#990000",
+            activebackground="#7a0000",
+            fg="white",
+            font=exit_button_font,
+            width=15,
+            height=2,
+            bd=0,
             relief="flat",
             cursor="hand2"
         )
@@ -133,12 +161,24 @@ class PassGoHomeApp:
         from passwordGeneratorScreen import PasswordGeneratorApp
         self.root.destroy()
         new_root = tk.Tk()
-        PasswordGeneratorApp(new_root)
+        PasswordGeneratorApp(new_root, self.data)
         new_root.mainloop()
 
     def open_saved_passwords(self):
         """Placeholder for viewing saved passwords."""
-        messagebox.showinfo("Coming Soon", "The 'View and Edit Saved Passwords' feature is under development.")
+        from loadPasswordsScreen import LoadPasswordsApp
+        self.root.destroy()
+        new_root = tk.Tk()
+        LoadPasswordsApp(new_root, self.data)
+        new_root.mainloop()
+
+    def view_saved_passwords(self):
+        """Placeholder for viewing saved passwords."""
+        from viewPasswordsScreen import ViewPasswordsApp
+        self.root.destroy()
+        new_root = tk.Tk()
+        ViewPasswordsApp(new_root, self.data)
+        new_root.mainloop()
 
     def exit_app(self):
         """Exits the application."""
