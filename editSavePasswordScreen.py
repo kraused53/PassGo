@@ -1,16 +1,19 @@
-# By Neil Patil
+# By Andrew Hamade
 import tkinter as tk
 from tkinter import messagebox
 # Import the save logic from your friend's file
-from savePassword import save_password
+from editPassword import edit_password
 
-class SavePasswordApp:
-    def __init__(self, root, generated_password=""):
+class EditSavePasswordApp:
+    def __init__(self, root, platform, generated_password=""):
         self.root = root
         self.generated_password = generated_password
+
+        old_platform = platform
+        old_password = generated_password
         
         # --- Window Configuration ---
-        self.root.title("Save Password - PassGo")
+        self.root.title("Edit Saved Password - PassGo")
         self.root.configure(bg="#e3eaf2")
         
         self.window_width = 700
@@ -77,6 +80,9 @@ class SavePasswordApp:
         )
         self.password_display.grid(row=1, column=1, sticky="w", padx=(15, 0), pady=8)
         
+        # Populate the platform field from previous screen
+        self.platform_entry.insert(0, platform)
+
         # Populate the password field if passed from previous screen
         if self.generated_password:
             self.password_display.config(state="normal")
@@ -90,7 +96,7 @@ class SavePasswordApp:
         save_button = tk.Button(
             action_frame, 
             text="Save Password", 
-            command=self.handle_save_password,  # Updated to call the handler
+            command=lambda: self.handle_edit_password(old_platform,old_password),  # Updated to call the handler
             bg="#FFA500", 
             activebackground="#FF8C00", 
             font=button_font, 
@@ -117,7 +123,7 @@ class SavePasswordApp:
         y_coordinate = int((screen_height / 2) - (height / 2))
         self.root.geometry(f'{width}x{height}+{x_coordinate}+{y_coordinate}')
 
-    def handle_save_password(self):
+    def handle_edit_password(self, old_platform, old_password):
         """Retrieves data from GUI and calls the external save function."""
         platform = self.platform_entry.get().strip()
         password = self.password_display.get()
@@ -128,7 +134,7 @@ class SavePasswordApp:
             
         # Call the external save function and handle success or failure
         try:
-            save_password(platform, password)
+            edit_password(platform, password, old_platform, old_password)
             # Password Storage Team: Uncomment this once savePassword.py is updated
             messagebox.showinfo("Success", f"Password for '{platform}' saved successfully!")
             # this is placeholder for us
@@ -154,5 +160,5 @@ class SavePasswordApp:
 # Example usage to test this file independently
 if __name__ == "__main__":
     root = tk.Tk()
-    app = SavePasswordApp(root, generated_password="qTs_iJ1G")
+    app = EditSavePasswordApp(root, platform="Netflix", generated_password="qTs_iJ1G")
     root.mainloop()

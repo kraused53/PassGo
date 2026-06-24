@@ -137,8 +137,12 @@ class PassGoHomeApp:
         new_root.mainloop()
 
     def open_saved_passwords(self):
-        """Placeholder for viewing saved passwords."""
-        messagebox.showinfo("Coming Soon", "The 'View and Edit Saved Passwords' feature is under development.")
+        """Navigates to the Edit and Save Password Screen."""
+        from editPasswordScreen import SaveAndEditScreen
+        self.root.destroy()
+        new_root = tk.Tk()
+        SaveAndEditScreen(new_root)
+        new_root.mainloop()
 
     def exit_app(self):
         """Exits the application."""
