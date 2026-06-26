@@ -4,13 +4,17 @@ from tkinter import messagebox
 # Import the algorithm function from the separate file
 from passwordGenerationAlgo import generate_password
 
+from AppData import AppData
+
 class EditGeneratorApp:
-    def __init__(self, root, platform, password):
+    def __init__(self, root, platform, password, data: AppData):
 
         self.root = root
         # Window Title
         self.root.title("Edit Generator - PassGo")
         
+        self.data = data
+
         # --- Set Background Color ---
         self.root.configure(bg="#e3eaf2")
         
@@ -241,7 +245,7 @@ class EditGeneratorApp:
         
         # Create a new root window for the save screen
         new_root = tk.Tk()
-        EditSavePasswordApp(new_root, platform, generated_password=current_password)
+        EditSavePasswordApp(new_root, platform, generated_password=current_password, data=self.data)
         new_root.mainloop()
 
     def back_to_saved(self):
@@ -254,7 +258,7 @@ class EditGeneratorApp:
             from editPasswordScreen import SaveAndEditScreen
             self.root.destroy()
             new_root = tk.Tk()
-            SaveAndEditScreen(new_root)
+            SaveAndEditScreen(new_root, self.data)
             new_root.mainloop()
 
 def main():

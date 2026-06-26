@@ -1,17 +1,20 @@
 # By Andrew Hamade
 import tkinter as tk
 from tkinter import messagebox
-# Import the save logic from your friend's file
-from editPassword import edit_password
+from makeDateString import make_date_str
+
+from AppData import AppData
 
 class EditSavePasswordApp:
-    def __init__(self, root, platform, generated_password=""):
+    def __init__(self, root, platform, generated_password="", data: AppData = None):
         self.root = root
         self.generated_password = generated_password
 
         old_platform = platform
         old_password = generated_password
         
+        self.data = data
+
         # --- Window Configuration ---
         self.root.title("Edit Saved Password - PassGo")
         self.root.configure(bg="#e3eaf2")
@@ -134,7 +137,9 @@ class EditSavePasswordApp:
             
         # Call the external save function and handle success or failure
         try:
-            edit_password(platform, password, old_platform, old_password)
+            if platform in self.data.user_passwords:
+                del self.data.user_passwords[platform]
+            self.data.add_password(platform, password, make_date_str())
             # Password Storage Team: Uncomment this once savePassword.py is updated
             messagebox.showinfo("Success", f"Password for '{platform}' saved successfully!")
             # this is placeholder for us
@@ -154,7 +159,7 @@ class EditSavePasswordApp:
             
             self.root.destroy()
             new_root = tk.Tk()
-            PassGoHomeApp(new_root)
+            PassGoHomeApp(new_root, self.data)
             new_root.mainloop()
 
 # Example usage to test this file independently

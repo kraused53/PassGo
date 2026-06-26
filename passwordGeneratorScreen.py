@@ -4,8 +4,10 @@ from tkinter import messagebox
 # Import the algorithm function from the separate file
 from passwordGenerationAlgo import generate_password
 
+from AppData import AppData
+
 class PasswordGeneratorApp:
-    def __init__(self, root):
+    def __init__(self, root, data: AppData):
         self.root = root
         # Window Title
         self.root.title("Password Generator - PassGo")
@@ -13,6 +15,8 @@ class PasswordGeneratorApp:
         # --- Set Background Color ---
         self.root.configure(bg="#e3eaf2")
         
+        self.data = data
+
         # --- Window Dimensions ---
         self.window_width = 700
         self.window_height = 620 
@@ -237,7 +241,7 @@ class PasswordGeneratorApp:
         
         # Create a new root window for the save screen
         new_root = tk.Tk()
-        SavePasswordApp(new_root, generated_password=current_password)
+        SavePasswordApp(new_root, generated_password=current_password, data = self.data)
         new_root.mainloop()
 
     def back_to_home(self):
@@ -250,7 +254,7 @@ class PasswordGeneratorApp:
             from homeScreen import PassGoHomeApp
             self.root.destroy()
             new_root = tk.Tk()
-            PassGoHomeApp(new_root)
+            PassGoHomeApp(new_root, self.data)
             new_root.mainloop()
 
 def main():

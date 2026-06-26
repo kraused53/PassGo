@@ -1,11 +1,12 @@
 # By Neil Patil
 import tkinter as tk
 from tkinter import messagebox
-# Import the save logic from your friend's file
-from savePassword import save_password
+from makeDateString import make_date_str
+
+from AppData import AppData
 
 class SavePasswordApp:
-    def __init__(self, root, generated_password=""):
+    def __init__(self, root, generated_password="", data: AppData = None):
         self.root = root
         self.generated_password = generated_password
         
@@ -19,6 +20,8 @@ class SavePasswordApp:
         self.root.geometry(f"{self.window_width}x{self.window_height}")
         self.root.resizable(False, False)
         self.center_window(self.window_width, self.window_height)
+
+        self.data = data
 
         # --- Fonts ---
         main_font = ("Trebuchet MS", 11)
@@ -122,14 +125,14 @@ class SavePasswordApp:
         platform = self.platform_entry.get().strip()
         password = self.password_display.get()
         
+
         if not platform:
             messagebox.showwarning("Input Missing", "Please enter a Platform/Service name.")
             return
             
         # Call the external save function and handle success or failure
         try:
-            save_password(platform, password)
-            # Password Storage Team: Uncomment this once savePassword.py is updated
+            self.data.add_password(platform, password, make_date_str()) # Password Storage Team: Uncomment this once savePassword.py is updated
             messagebox.showinfo("Success", f"Password for '{platform}' saved successfully!")
             # this is placeholder for us
             #messagebox.showinfo("This feature is currently under development.")
@@ -145,10 +148,9 @@ class SavePasswordApp:
         if confirm:
             # LAZY IMPORT: Moved inside function to prevent circular dependency
             from homeScreen import PassGoHomeApp
-            
             self.root.destroy()
             new_root = tk.Tk()
-            PassGoHomeApp(new_root)
+            PassGoHomeApp(new_root, self.data)
             new_root.mainloop()
 
 # Example usage to test this file independently

@@ -3,9 +3,10 @@ import tkinter as tk
 from tkinter import messagebox
 import os
 import csv
+from AppData import AppData
 
 class SaveAndEditScreen:
-    def __init__(self, root):
+    def __init__(self, root, data: AppData):
         self.root = root
         # Window Title
         self.root.title("Saved Passwords - PassGo")
@@ -13,6 +14,8 @@ class SaveAndEditScreen:
         # --- Set Background Color ---
         self.root.configure(bg="#e3eaf2")
         
+        self.data = data
+
         # --- Window Dimensions ---
         self.window_width = 1000
         self.window_height = 620 
@@ -112,56 +115,54 @@ class SaveAndEditScreen:
         # --- Populating Passwords ---
         file = "passSave.csv"
 
-        if os.path.exists(file):
-            with open(file, "r") as fileR:
-                csv_reader = csv.reader(fileR)
-                for i in csv_reader:
-                    platform = i[0]
-                    password = i[1]
-                    date = i[2]
+        passwords = self.data.get_passwords()
+        for k in passwords.keys():
+            platform = k
+            password = passwords[k][0]
+            date = passwords[k][1]
 
-                    # Platform Value
-                    platform_text_frame = tk.Frame(platform_frame, bg="white", bd=1, relief="solid")
-                    platform_text_frame.pack(fill=tk.X)
+            # Platform Value
+            platform_text_frame = tk.Frame(platform_frame, bg="white", bd=1, relief="solid")
+            platform_text_frame.pack(fill=tk.X)
 
-                    platform_text_label = tk.Label(platform_text_frame, text=platform, font=title_font, bg="white", justify="center")
-                    platform_text_label.pack(ipady=5)
+            platform_text_label = tk.Label(platform_text_frame, text=platform, font=title_font, bg="white", justify="center")
+            platform_text_label.pack(ipady=5)
 
-                    #Password Value
-                    password_text_frame = tk.Frame(password_frame, bg="white", bd=1, relief="solid")
-                    password_text_frame.pack(fill=tk.X)
+            #Password Value
+            password_text_frame = tk.Frame(password_frame, bg="white", bd=1, relief="solid")
+            password_text_frame.pack(fill=tk.X)
 
-                    password_text_label = tk.Label(password_text_frame, text=password, font=title_font, bg="white", justify="center")
-                    password_text_label.pack(ipady=5)
+            password_text_label = tk.Label(password_text_frame, text=password, font=title_font, bg="white", justify="center")
+            password_text_label.pack(ipady=5)
 
-                    #Date Value
-                    date_text_frame = tk.Frame(date_frame, bg="white", bd=1, relief="solid")
-                    date_text_frame.pack(fill=tk.X)
+            #Date Value
+            date_text_frame = tk.Frame(date_frame, bg="white", bd=1, relief="solid")
+            date_text_frame.pack(fill=tk.X)
 
-                    date_text_label = tk.Label(date_text_frame, text=date, font=title_font, bg="white", justify="center")
-                    date_text_label.pack(ipady=5)
+            date_text_label = tk.Label(date_text_frame, text=date, font=title_font, bg="white", justify="center")
+            date_text_label.pack(ipady=5)
 
-                    #Options
-                    options_button_frame = tk.Frame(options_frame, bg="white", bd=1, relief="solid")
-                    options_button_frame.pack(fill=tk.X)
+            #Options
+            options_button_frame = tk.Frame(options_frame, bg="white", bd=1, relief="solid")
+            options_button_frame.pack(fill=tk.X)
 
-                    options_button_center_frame = tk.Frame(options_button_frame, bg="white")
-                    options_button_center_frame.pack()
+            options_button_center_frame = tk.Frame(options_button_frame, bg="white")
+            options_button_center_frame.pack()
 
-                    edit_button = tk.Button(
-                        options_button_center_frame, text="Edit", command=lambda plat=platform, pw=password: self.edit_password(plat, pw),
-                        bg="#f7ad1b", activebackground="#fac255", borderwidth=0, font=back_button_font, width = 7
-                    ).pack(side=tk.LEFT, padx=(0,10), pady=5)
+            edit_button = tk.Button(
+                options_button_center_frame, text="Edit", command=lambda plat=platform, pw=password: self.edit_password(plat, pw),
+                bg="#f7ad1b", activebackground="#fac255", borderwidth=0, font=back_button_font, width = 7
+            ).pack(side=tk.LEFT, padx=(0,10), pady=5)
 
-                    copy_button = tk.Button(
-                        options_button_center_frame, text="Copy", command=lambda pw=password: self.copy_password(pw),
-                        bg="#ffd91c", activebackground="#ffe047", borderwidth=0, font=back_button_font, width = 7
-                    ).pack(side=tk.LEFT, padx=10, pady=5)
+            copy_button = tk.Button(
+                options_button_center_frame, text="Copy", command=lambda pw=password: self.copy_password(pw),
+                bg="#ffd91c", activebackground="#ffe047", borderwidth=0, font=back_button_font, width = 7
+            ).pack(side=tk.LEFT, padx=10, pady=5)
 
-                    delete_button = tk.Button(
-                        options_button_center_frame, text="Delete", command=lambda plat=platform, pw=password, dt=date: self.delete_password(plat, pw, dt),
-                        bg="#cc0000", activebackground="#db3535", borderwidth=0, font=back_button_font, width = 7
-                    ).pack(side=tk.LEFT, padx=(10,0), pady=5)
+            delete_button = tk.Button(
+                options_button_center_frame, text="Delete", command=lambda plat=platform, pw=password, dt=date: self.delete_password(plat, pw, dt),
+                bg="#cc0000", activebackground="#db3535", borderwidth=0, font=back_button_font, width = 7
+            ).pack(side=tk.LEFT, padx=(10,0), pady=5)
 
     def back_to_home(self):
         """Navigates back to home screen with confirmation."""
@@ -173,7 +174,7 @@ class SaveAndEditScreen:
             from homeScreen import PassGoHomeApp
             self.root.destroy()
             new_root = tk.Tk()
-            PassGoHomeApp(new_root)
+            PassGoHomeApp(new_root, self.data)
             new_root.mainloop()
 
     def edit_password(self, platform, password):
@@ -181,7 +182,7 @@ class SaveAndEditScreen:
         from editGenerationScreen import EditGeneratorApp
         self.root.destroy()
         new_root = tk.Tk()
-        EditGeneratorApp(new_root, platform, password)
+        EditGeneratorApp(new_root, platform, password, self.data)
         new_root.mainloop()
 
 
@@ -193,21 +194,18 @@ class SaveAndEditScreen:
         messagebox.showinfo("Success", "Password copied to clipboard!")
 
     def delete_password(self, platform, password, date):
-        """Deletes passwords in passSave.csv"""
-        file = "passSave.csv"
-        newPasswordList = []
+        del self.data.user_passwords[platform]
 
-        if os.path.exists(file):
-            with open(file, "r", newline='') as fileR:
-                csv_reader = csv.reader(fileR)
-                for i in csv_reader:
-                    if (i != [platform, password, date]):
-                        newPasswordList.append(i)
-
-            with open(file, "w", newline='') as fileW:
-                writer = csv.writer(fileW)
-                writer.writerows(newPasswordList)
-
+        confirm = messagebox.askyesno(
+            "Confirm Exit", 
+            "Are you sure you want to delete this password?"
+        )
+        if confirm:
+            from editPasswordScreen import SaveAndEditScreen
+            self.root.destroy()
+            new_root = tk.Tk()
+            SaveAndEditScreen(new_root, self.data)
+            new_root.mainloop()
 
 def main():
     root = tk.Tk()
