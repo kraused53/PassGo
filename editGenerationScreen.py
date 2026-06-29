@@ -1,4 +1,4 @@
-# By Neil Patil
+# By Andrew Hamade
 import tkinter as tk
 from tkinter import messagebox
 # Import the algorithm function from the separate file
@@ -6,17 +6,18 @@ from passwordGenerationAlgo import generate_password
 
 from AppData import AppData
 
-class PasswordGeneratorApp:
-    def __init__(self, root, data: AppData):
+class EditGeneratorApp:
+    def __init__(self, root, platform, password, data: AppData):
+
         self.root = root
         # Window Title
-        self.root.title("Password Generator - PassGo")
-        
-        # --- Set Background Color ---
-        self.root.configure(bg="#e3eaf2")
+        self.root.title("Edit Generator - PassGo")
         
         self.data = data
 
+        # --- Set Background Color ---
+        self.root.configure(bg="#e3eaf2")
+        
         # --- Window Dimensions ---
         self.window_width = 700
         self.window_height = 620 
@@ -31,7 +32,7 @@ class PasswordGeneratorApp:
         self.include_special = tk.BooleanVar(value=True)
 
         # Create UI elements
-        self.create_widgets()
+        self.create_widgets(platform, password)
       
         # Auto-Center Logic
         self.center_window(self.window_width, self.window_height)
@@ -49,7 +50,7 @@ class PasswordGeneratorApp:
 
         self.root.geometry(f'{width}x{height}+{x_coordinate}+{y_coordinate}')
 
-    def create_widgets(self):
+    def create_widgets(self, platform, password):
         # Define fonts using Trebuchet MS
         main_font = ("Trebuchet MS", 11)
         title_font = ("Trebuchet MS", 12)
@@ -64,8 +65,8 @@ class PasswordGeneratorApp:
 
         back_button = tk.Button(
             header_frame, 
-            text="← Back to Home", 
-            command=self.back_to_home, 
+            text="← Back to Saved Passwords", 
+            command=self.back_to_saved, 
             bg="#e6f2ff", 
             activebackground="#cce5ff", 
             borderwidth=0, 
@@ -83,7 +84,7 @@ class PasswordGeneratorApp:
 
         note_label = tk.Label(
             self.root, 
-            text="Note: A password may be generated already with default settings. \n Passwords must be between 6 and 64 characters long. At least one character type must be selected.", 
+            text="Note: To change the platform, click Save Password. \n Passwords must be between 6 and 64 characters long. At least one character type must be selected.", 
             fg="gray", 
             font=note_font, 
             bg="#e3eaf2"
@@ -170,7 +171,7 @@ class PasswordGeneratorApp:
         save_button = tk.Button(
             action_frame, 
             text="Save Password", 
-            command=self.save_password, 
+            command=lambda: self.save_password(platform), 
             bg="#FFA500", 
             activebackground="#FF8C00", 
             font=button_font, 
@@ -179,7 +180,10 @@ class PasswordGeneratorApp:
         save_button.grid(row=1, column=2, padx=(15, 0), pady=(0, 5))
 
         # Generate initial password on startup
-        self.generate_password()
+        self.password_display.config(state="normal")
+        self.password_display.delete(0, tk.END)
+        self.password_display.insert(0, password)
+        self.password_display.config(state="readonly")
 
     def generate_password(self):
         """
@@ -228,7 +232,7 @@ class PasswordGeneratorApp:
         else:   
             messagebox.showwarning("Warning", "No password to copy. Please generate one first.")
 
-    def save_password(self):
+    def save_password(self, platform):
         """Opens the Save Password screen and passes the current password."""
         current_password = self.password_display.get()
         
@@ -237,27 +241,27 @@ class PasswordGeneratorApp:
             return
 
         # LAZY IMPORT: Moved inside function to prevent circular dependency
-        from savePasswordScreen import SavePasswordApp
+        from editSavePasswordScreen import EditSavePasswordApp
 
         # Close the current generator window
         self.root.destroy()
         
         # Create a new root window for the save screen
         new_root = tk.Tk()
-        SavePasswordApp(new_root, generated_password=current_password, data = self.data)
+        EditSavePasswordApp(new_root, platform, generated_password=current_password, data=self.data)
         new_root.mainloop()
 
-    def back_to_home(self):
-        """Navigates back to home screen with confirmation."""
+    def back_to_saved(self):
+        """Navigates to the Edit and Save Password Screen with confirmation."""
         confirm = messagebox.askyesno(
             "Confirm Exit", 
-            "Are you sure you want to cancel the operation and go back to Home?"
+            "Are you sure you want to cancel the operation and go back to Saved Passwords?"
         )
         if confirm:
-            from homeScreen import PassGoHomeApp
+            from editPasswordScreen import SaveAndEditScreen
             self.root.destroy()
             new_root = tk.Tk()
-            PassGoHomeApp(new_root, self.data)
+            SaveAndEditScreen(new_root, self.data)
             new_root.mainloop()
 
     def exit_app(self):
@@ -267,7 +271,7 @@ class PasswordGeneratorApp:
 
 def main():
     root = tk.Tk()
-    app = PasswordGeneratorApp(root)
+    app = EditGeneratorApp(root, "Test Platform", "Test Password")
     root.mainloop()
 
 if __name__ == "__main__":

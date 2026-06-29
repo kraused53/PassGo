@@ -122,6 +122,5 @@ if __name__ == "__main__":
     # Example usage
     try:
         pwd = generate_password(8, 12, True, True, True, True)
-        print(f"Generated Password: {pwd}")
     except ValueError as e:
         print(e)

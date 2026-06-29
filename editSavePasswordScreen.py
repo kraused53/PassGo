@@ -1,17 +1,22 @@
-# By Neil Patil
+# By Andrew Hamade
 import tkinter as tk
 from tkinter import messagebox
 from makeDateString import make_date_str
 
 from AppData import AppData
 
-class SavePasswordApp:
-    def __init__(self, root, generated_password="", data: AppData = None):
+class EditSavePasswordApp:
+    def __init__(self, root, platform, generated_password="", data: AppData = None):
         self.root = root
         self.generated_password = generated_password
+
+        old_platform = platform
+        old_password = generated_password
         
+        self.data = data
+
         # --- Window Configuration ---
-        self.root.title("Save Password - PassGo")
+        self.root.title("Edit Saved Password - PassGo")
         self.root.configure(bg="#e3eaf2")
         
         self.window_width = 700
@@ -20,8 +25,6 @@ class SavePasswordApp:
         self.root.geometry(f"{self.window_width}x{self.window_height}")
         self.root.resizable(False, False)
         self.center_window(self.window_width, self.window_height)
-
-        self.data = data
 
         # --- Fonts ---
         main_font = ("Trebuchet MS", 11)
@@ -37,7 +40,7 @@ class SavePasswordApp:
 
         back_button = tk.Button(
             header_frame, 
-            text="← Back to Generation", 
+            text="← Back to Saved Passwords", 
             command=self.navigate_back, 
             bg="#e6f2ff", 
             activebackground="#cce5ff", 
@@ -80,6 +83,9 @@ class SavePasswordApp:
         )
         self.password_display.grid(row=1, column=1, sticky="w", padx=(15, 0), pady=8)
         
+        # Populate the platform field from previous screen
+        self.platform_entry.insert(0, platform)
+
         # Populate the password field if passed from previous screen
         if self.generated_password:
             self.password_display.config(state="normal")
@@ -93,7 +99,7 @@ class SavePasswordApp:
         save_button = tk.Button(
             action_frame, 
             text="Save Password", 
-            command=self.handle_save_password,  # Updated to call the handler
+            command=lambda: self.handle_edit_password(old_platform,old_password),  # Updated to call the handler
             bg="#FFA500", 
             activebackground="#FF8C00", 
             font=button_font, 
@@ -123,19 +129,21 @@ class SavePasswordApp:
         y_coordinate = int((screen_height / 2) - (height / 2))
         self.root.geometry(f'{width}x{height}+{x_coordinate}+{y_coordinate}')
 
-    def handle_save_password(self):
+    def handle_edit_password(self, old_platform, old_password):
         """Retrieves data from GUI and calls the external save function."""
         platform = self.platform_entry.get().strip()
         password = self.password_display.get()
         
-
         if not platform:
             messagebox.showwarning("Input Missing", "Please enter a Platform/Service name.")
             return
             
         # Call the external save function and handle success or failure
         try:
-            self.data.add_password(platform, password, make_date_str()) # Password Storage Team: Uncomment this once savePassword.py is updated
+            if platform in self.data.user_passwords:
+                del self.data.user_passwords[platform]
+            self.data.add_password(platform, password, make_date_str())
+            # Password Storage Team: Uncomment this once savePassword.py is updated
             messagebox.showinfo("Success", f"Password for '{platform}' saved successfully!")
             # this is placeholder for us
             #messagebox.showinfo("This feature is currently under development.")
@@ -143,17 +151,16 @@ class SavePasswordApp:
             messagebox.showerror("Save Error", f"Failed to save password: {str(e)}")
 
     def navigate_back(self):
-        """Closes save screen and re-opens the generation screen with confirmation."""
+        """Closes save screen and re-opens the saved passwords screen with confirmation."""
         confirm = messagebox.askyesno(
             "Confirm Exit", 
             "Are you sure you want to cancel the operation and go back to Home?"
         )
         if confirm:
-            # LAZY IMPORT: Moved inside function to prevent circular dependency
-            from passwordGeneratorScreen import PasswordGeneratorApp
+            from editPasswordScreen import SaveAndEditScreen
             self.root.destroy()
             new_root = tk.Tk()
-            PasswordGeneratorApp(new_root, data=self.data)
+            SaveAndEditScreen(new_root, self.data)
             new_root.mainloop()
 
     def exit_app(self):
@@ -164,5 +171,5 @@ class SavePasswordApp:
 # Example usage to test this file independently
 if __name__ == "__main__":
     root = tk.Tk()
-    app = SavePasswordApp(root, generated_password="qTs_iJ1G")
+    app = EditSavePasswordApp(root, platform="Netflix", generated_password="qTs_iJ1G")
     root.mainloop()
